@@ -1,0 +1,15 @@
+{
+  "name": "careermind-mern",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "dev": "npm --prefix client run dev",
+    "dev:client": "npm --prefix client run dev",
+    "dev:server": "npm --prefix server run dev",
+    "build": "npm --prefix client install --no-audit --no-fund && npm --prefix client run build",
+    "seed": "npm --prefix server run seed",
+    "build:dev": "npm --prefix client install --no-audit --no-fund && npm --prefix client run build:dev",
+    "postinstall": "npm --prefix client install --no-audit --no-fund"
+  }
+}
