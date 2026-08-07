@@ -1,10 +1,9 @@
 import * as pdfjsLib from "pdfjs-dist";
 import mammoth from "mammoth";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+// Run PDF text extraction without an external worker file.
+(pdfjsLib.GlobalWorkerOptions as { disableWorker?: boolean }).disableWorker = true;
+
 
 export async function extractText(file: File): Promise<string> {
   const name = file.name.toLowerCase();

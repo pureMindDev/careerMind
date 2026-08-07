@@ -21,12 +21,18 @@ function SignupPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+
+    if (password.length < 8 || !/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+      setError("Password must be at least 8 characters and include a letter and a number.");
+      return;
+    }
+
+    setLoading(true);
     try {
       await signup(name, email, password);
-      toast.success("Account created — let's build your profile");
-      navigate("/dashboard");
+      toast.success("Account created — check your inbox to verify your email");
+      navigate("/verify-email");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -76,10 +82,14 @@ function SignupPage() {
             id="password"
             type="password"
             required
+            minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="At least 6 characters"
+            placeholder="At least 8 characters"
           />
+          <p className="text-xs text-muted-foreground">
+            At least 8 characters, including a letter and a number.
+          </p>
         </div>
         {error && <p className="text-sm text-destructive">{error}</p>}
         <Button

@@ -7,8 +7,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/context/AuthContext";
-import { analyzeCV } from "@/lib/api";
-import { extractText } from "@/lib/document-extract";
+import { uploadCV } from "@/lib/api";
 
 
 type Analysis = {
@@ -26,7 +25,6 @@ function CvAnalyzer() {
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
-  const runAnalyze = (analyzeCV);
 
   function accept(f: File | undefined) {
     if (!f) return;
@@ -35,8 +33,8 @@ function CvAnalyzer() {
       toast.error("Only PDF or DOCX files are supported.");
       return;
     }
-    if (f.size > 10 * 1024 * 1024) {
-      toast.error("File size must be under 10MB.");
+    if (f.size > 5 * 1024 * 1024) {
+      toast.error("File size must be under 5MB.");
       return;
     }
     setFile(f);
@@ -48,15 +46,10 @@ function CvAnalyzer() {
     if (!file) return;
     setStatus("loading");
     try {
-      const text = await extractText(file);
-      const result = await runAnalyze({
-        data: {
-          text: text.slice(0, 12000),
-          targetRole: user?.targetRole,
-          fileName: file.name,
-          fileSize: file.size,
-        },
-      });
+      // Text extraction happens server-side (Multer + pdf-parse/mammoth) —
+      // more reliable than parsing PDFs in the browser and avoids shipping
+      // a PDF.js worker to every visitor.
+      const result = await uploadCV(file, user?.targetRole);
       setAnalysis(result);
       setStatus("done");
       toast.success("Analysis complete");
@@ -88,7 +81,7 @@ function CvAnalyzer() {
           <Upload className="size-6 text-primary-foreground" />
         </span>
         <p className="mt-5 font-semibold">Drop your CV here</p>
-        <p className="mt-1 text-sm text-muted-foreground">PDF or DOCX, up to 10MB</p>
+        <p className="mt-1 text-sm text-muted-foreground">PDF or DOCX, up to 5MB</p>
         <input
           ref={inputRef}
           type="file"

@@ -1,0 +1,4 @@
+This folder is reserved for future disk-backed CV storage.
+CV uploads are currently handled in-memory (Multer memoryStorage) and never
+written here — the text is extracted and the buffer discarded. Kept as a
+placeholder so the folder ships if disk storage is added later.

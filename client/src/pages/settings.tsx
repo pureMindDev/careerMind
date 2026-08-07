@@ -16,6 +16,14 @@ import { useTheme } from "@/context/ThemeContext";
 import { updateUserProfile, updateUserSettings } from "@/lib/api";
 import { pricing } from "@/lib/mock-data";
 
+// Nigerian local format -> E.164 for the wa.me link (leading 0 dropped, +234 prepended).
+const UPGRADE_WHATSAPP_NUMBER = "2347017470501";
+
+function upgradeWhatsAppUrl(planName: string, price: string, period: string) {
+  const message = `Hi, I'd like to upgrade to the ${planName} plan (${price} ${period}) on CareerMind AI.`;
+  return `https://wa.me/${UPGRADE_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
 
 const notificationOptions = [
   { key: "matches", label: "New job matches above 85%", defaultOn: true },
@@ -181,13 +189,22 @@ function SettingsPage() {
                   variant={p.name === user?.plan ? "outline" : "default"}
                   className={p.name === user?.plan ? "mt-5 w-full" : "gradient-brand mt-5 w-full text-primary-foreground"}
                   disabled={p.name === user?.plan}
-                  onClick={() => toast.success(`Switched to ${p.name}`)}
+                  asChild={p.name !== user?.plan}
                 >
-                  {p.name === user?.plan ? "Current plan" : `Switch to ${p.name}`}
+                  {p.name === user?.plan ? (
+                    "Current plan"
+                  ) : (
+                    <a href={upgradeWhatsAppUrl(p.name, p.price, p.period)} target="_blank" rel="noopener noreferrer">
+                      Upgrade via WhatsApp
+                    </a>
+                  )}
                 </Button>
               </div>
             ))}
           </div>
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            Upgrades are handled manually for now — you'll be taken to WhatsApp to sort out payment.
+          </p>
         </TabsContent>
       </Tabs>
     </AppShell>

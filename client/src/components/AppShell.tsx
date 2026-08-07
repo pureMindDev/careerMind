@@ -13,10 +13,45 @@ import {
   Target,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { toast } from "sonner";
+import { MailWarning } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+function VerificationBanner() {
+  const { user, resendVerification } = useAuth();
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  if (!user || user.emailVerified) return null;
+
+  async function onResend() {
+    setSending(true);
+    try {
+      await resendVerification();
+      setSent(true);
+      toast.success("Verification email sent — check your inbox.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't send that, try again.");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm">
+      <MailWarning className="size-4 shrink-0 text-warning" />
+      <span className="flex-1 min-w-0">
+        Please verify your email address ({user.email}) to secure your account.
+      </span>
+      <Button size="sm" variant="outline" disabled={sending || sent} onClick={onResend}>
+        {sent ? "Sent" : sending ? "Sending..." : "Resend email"}
+      </Button>
+    </div>
+  );
+}
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -131,7 +166,10 @@ export function AppShell({
               {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </Button>
           </header>
-          <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</div>
+          <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+            <VerificationBanner />
+            {children}
+          </div>
         </main>
       </div>
     </div>

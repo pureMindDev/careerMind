@@ -41,6 +41,7 @@ export type UserProfile = {
   targetRole?: string;
   bio?: string;
   theme?: string;
+  emailVerified?: boolean;
 };
 
 export type CvAnalysis = {
@@ -102,6 +103,15 @@ export const loginRequest = (data: { email: string; password: string }) =>
 
 export const requestPasswordReset = (data: { email: string }) =>
   request<{ ok: true }>("/auth/forgot-password", { body: data });
+
+export const confirmPasswordReset = (data: { token: string; password: string }) =>
+  request<{ ok: true }>("/auth/reset-password", { body: data });
+
+export const verifyEmail = (data: { token: string }) =>
+  request<{ ok: true; user: UserProfile }>("/auth/verify-email", { body: data });
+
+export const resendVerificationEmail = (data: { email: string }) =>
+  request<{ ok: true }>("/auth/resend-verification", { body: data });
 
 export const getUserProfile = () => request<UserProfile>("/auth/me");
 

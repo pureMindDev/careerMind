@@ -4,6 +4,9 @@ import {
   getUserProfile,
   loginRequest,
   requestPasswordReset,
+  confirmPasswordReset,
+  verifyEmail as verifyEmailRequest,
+  resendVerificationEmail,
   setToken,
   getToken,
   signupRequest,
@@ -19,6 +22,9 @@ type AuthState = {
   signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   resetPassword: (email: string) => Promise<void>;
+  confirmReset: (token: string, password: string) => Promise<void>;
+  verifyEmail: (token: string) => Promise<void>;
+  resendVerification: () => Promise<void>;
   refresh: () => Promise<void>;
 };
 
@@ -66,9 +72,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await requestPasswordReset({ email });
   }, []);
 
+  const confirmReset = useCallback(async (token: string, password: string) => {
+    await confirmPasswordReset({ token, password });
+  }, []);
+
+  const verifyEmail = useCallback(
+    async (token: string) => {
+      const { user: profile } = await verifyEmailRequest({ token });
+      setUser(profile);
+    },
+    [],
+  );
+
+  const resendVerification = useCallback(async () => {
+    if (!user) return;
+    await resendVerificationEmail({ email: user.email });
+  }, [user]);
+
   const value = useMemo<AuthState>(
-    () => ({ user, loading, login, signup, logout, resetPassword, refresh }),
-    [user, loading, login, signup, logout, resetPassword, refresh],
+    () => ({
+      user,
+      loading,
+      login,
+      signup,
+      logout,
+      resetPassword,
+      confirmReset,
+      verifyEmail,
+      resendVerification,
+      refresh,
+    }),
+    [user, loading, login, signup, logout, resetPassword, confirmReset, verifyEmail, resendVerification, refresh],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
