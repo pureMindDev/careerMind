@@ -116,9 +116,9 @@ Fly.io, a VPS, etc.
 Static build — deploy it anywhere that serves static files.
 
 - **Vercel / Netlify (recommended, no Docker needed):** import the repo, set the project root
-  to `client/`, build command `npm run build`, output directory `../dist` (the build is
-  configured to emit one level up — see `client/vite.config.ts`), and set the env var
-  `VITE_API_URL` to your deployed server's URL. Both platforms auto-detect Vite.
+  to `client/`, build command `npm run build`, output directory `dist` (Vercel/Netlify usually
+  auto-detect this for Vite projects), and set the env var `VITE_API_URL` to your deployed
+  server's URL.
 - **Docker/nginx:** build `client/Dockerfile` with
   `docker build --build-arg VITE_API_URL=https://your-api.example.com -t careermind-client .`
   — Vite inlines `VITE_*` vars at build time, so this must be a **build** arg, not a runtime

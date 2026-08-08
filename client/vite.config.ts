@@ -9,9 +9,7 @@ export default defineConfig({
     alias: { "@": path.resolve(__dirname, "./src") },
   },
   build: {
-    // Emit to the repo root so deploy/dist checks find ./dist
-    outDir: path.resolve(__dirname, "../dist"),
-    emptyOutDir: true,
+    outDir: "dist",
   },
   server: {
     port: 8080,
